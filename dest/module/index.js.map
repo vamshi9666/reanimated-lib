@@ -1,0 +1,1 @@
+{"version":3,"sources":["index.ts"],"names":["ReanimatedModal","Effect"],"mappings":"AAAA,MAAOA,CAAAA,eAAP,EAA0BC,MAA1B,KAAwC,WAAxC,CAEA,OAASD,eAAT,CAA0BC,MAA1B","sourcesContent":["import ReanimatedModal, { Effect } from \"./ReModal\";\n\nexport { ReanimatedModal, Effect };\n"]}

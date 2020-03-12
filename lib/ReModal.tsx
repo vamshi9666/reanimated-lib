@@ -1,13 +1,11 @@
 import React, { Component } from "react";
-import { StyleSheet, View, Text, Dimensions } from "react-native";
+import { StyleSheet, Dimensions } from "react-native";
 import Animated, { Easing } from "react-native-reanimated";
 import {} from "react-native-gesture-handler";
 const { height } = Dimensions.get("window");
 const {
   Value,
   cond,
-  debug,
-  onChange,
   eq,
   set,
   timing,
@@ -20,7 +18,15 @@ const {
   Extrapolate
 } = Animated;
 
-function runTiming({ clock, value, dest }) {
+function runTiming({
+  clock,
+  value,
+  dest
+}: {
+  clock: any;
+  value: any;
+  dest: any;
+}) {
   // const clock = new Clock();
   const state = {
     finished: new Value(0),
@@ -55,44 +61,43 @@ function runTiming({ clock, value, dest }) {
   ]);
 }
 
-enum Effect {
+export enum Effect {
   SLIDE_FROM_BOTTOM = 1,
-  SLIDE_FROM_TOP = 2,
-  SLIDE_FROM_LEFT = 3,
-  SLIDE_FROM_RIGHT = 4
+  SLIDE_FROM_TOP = 2
+  // SLIDE_FROM_LEFT = 3,
+  // SLIDE_FROM_RIGHT = 4
 }
 interface IProps {
   visible: Boolean;
-  callbackNode: Animated.Adaptable<Number>;
+  callbackNode: Animated.Value<number>;
   fromDirection?: String;
-  showModal: Animated.Adaptable<Number>;
+  showModal: Animated.Adaptable<number>;
   effect: Effect;
 }
 interface IState {}
 class ReanimatedModal extends Component<IProps, IState> {
-  constructor(props) {
+  private modalTranslateY: Animated.Value<number> = new Value(height);
+  // private progress: Animated.Value<number> = new Value(0);
+  private shadowOpacity: Animated.Value<number> = new Value(0);
+  private fromCoordinate: Animated.Value<number> = new Value();
+  private toCoordinate: Animated.Value<number> = new Value(0);
+
+  private clock = new Clock();
+  constructor(props: IProps) {
     super(props);
     this.state = {};
-    this.modalTranslateY = new Value(height);
-    this.progress = new Value(0);
-    this.shadowOpacity = new Value(0);
-    this.fromCoordinate = new Value();
-    // this.toCoordinate = new Value();
-    this.toCoordinate = new Value(0);
-    if (props.effect === 1) {
-      this.fromCoordinate = new Value(height);
-      this.modalTranslateY = new Value(height);
-    } else if (props.effect === 2) {
-      this.fromCoordinate = new Value(-height);
-      this.modalTranslateY = new Value(-height);
-      // this.toCoordinate = new Value(0);
+    if (props.effect === Effect.SLIDE_FROM_BOTTOM) {
+      this.fromCoordinate.setValue(height);
+      this.modalTranslateY.setValue(height);
+    } else if (this.props.effect === Effect.SLIDE_FROM_TOP) {
+      this.fromCoordinate.setValue(-height);
+      this.modalTranslateY.setValue(-height);
+      // private toCoordinate = new Value(0);
     }
-
-    this.clock = new Clock();
   }
 
   render() {
-    const { showModal, effect } = this.props;
+    const { showModal } = this.props;
     return (
       <>
         <Animated.Code>
@@ -106,7 +111,7 @@ class ReanimatedModal extends Component<IProps, IState> {
                 interpolate(this.modalTranslateY, {
                   inputRange: [this.fromCoordinate, this.toCoordinate],
                   outputRange: [1, 0],
-                  expextrapolate: Extrapolate.CLAMP
+                  extrapolate: Extrapolate.CLAMP
                 })
                 // )
               ),
@@ -115,7 +120,7 @@ class ReanimatedModal extends Component<IProps, IState> {
                 interpolate(this.modalTranslateY, {
                   inputRange: [this.fromCoordinate, this.toCoordinate],
                   outputRange: [0, 1],
-                  expextrapolate: Extrapolate.CLAMP
+                  extrapolate: Extrapolate.CLAMP
                 })
                 // )
               ),
@@ -153,12 +158,7 @@ class ReanimatedModal extends Component<IProps, IState> {
         <Animated.View
           style={{
             ...styles.container,
-            transform: [
-              { translateY: this.modalTranslateY }
-              // {
-              //   translateY: this.fromCoordinate
-              // }
-            ]
+            transform: [{ translateY: this.modalTranslateY as any }]
           }}
         ></Animated.View>
       </>
@@ -178,6 +178,3 @@ const styles = StyleSheet.create({
     backgroundColor: "red"
   }
 });
-
-const PRIMATY_COLOR = "#101935";
-const SECONDARY_COLOR = "#dbcbd8";
